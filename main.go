@@ -229,6 +229,20 @@ func ratesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
+func enableCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next(w, r)
+	}
+}
+
 func main() {
 	loadEnv()
 
@@ -237,8 +251,11 @@ func main() {
 		log.Println("API_KEY_EXCHANGE environment variable not set")
 	}
 
-	http.HandleFunc("/convert", convertHandler)
-	http.HandleFunc("/rates", ratesHandler)
+	fs := http.FileServer(http.Dir("./frontend"))
+	http.Handle("/", fs)
+
+	http.HandleFunc("/convert", enableCORS(convertHandler))
+	http.HandleFunc("/rates", enableCORS(ratesHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
