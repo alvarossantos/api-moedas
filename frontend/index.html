@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câmbio Pro | Go Backend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-wallet"></i> GoCurrency
+            </div>
+            <p>Cotações em tempo real</p>
+        </header>
+
+        <main class="card glass">
+            <div class="input-group big-amount">
+                <label for="amount">Valor a converter</label>
+                <div class="input-wrapper" id="amount-wrapper">
+                    <span class="currency-symbol">$</span>
+                    <input type="text" id="amount" value="" placeholder="0.00" autocomplete="off">
+                </div>
+                <small id="input-feedback" class="input-feedback hidden"></small>
+            </div>
+
+            <div class="exchange-grid">
+                <div class="select-group">
+                    <label for="from">De</label>
+                    <div class="custom-select">
+                        <select id="from"></select>
+                        <i class="fas fa-chevron-down select-icon"></i>
+                    </div>
+                </div>
+
+                <button id="swap-btn" class="swap-btn" aria-label="Inverter moedas">
+                    <i class="fas fa-exchange-alt"></i>
+                </button>
+
+                <div class="select-group">
+                    <label for="to">Para</label>
+                    <div class="custom-select">
+                        <select id="to"></select>
+                        <i class="fas fa-chevron-down select-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <button id="convert-btn" class="btn-primary">
+                Converter Agora
+            </button>
+
+            <div id="result" class="result-container hidden">
+                <p class="result-label">Resultado</p>
+                <h2 id="converted-value">0.00</h2>
+            </div>
+            
+            <div id="error" class="alert error hidden"></div>
+        </main>
+
+        <section class="rates-section glass mt-4">
+            <div class="rates-header">
+                <h3><i class="fas fa-chart-line"></i> Taxas de Mercado</h3>
+                <div class="custom-select" style="min-width: 110px;">
+                    <select id="base-currency"></select>
+                    <i class="fas fa-chevron-down select-icon"></i>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="rates-table">
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="rates-error" class="alert error hidden"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
