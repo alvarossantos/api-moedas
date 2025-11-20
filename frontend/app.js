@@ -121,9 +121,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) throw new Error(data.error || 'Erro na conversão.');
 
+            const inputFormatted = amountForServer.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
             const resultFormatted = data.result.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
             
-            convertedValueP.innerHTML = `${resultFormatted} <small>${to}</small>`;
+            const impliedRate = data.result / amountForServer;
+
+            const rateFormatted = impliedRate.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 6});
+            
+            convertedValueP.innerHTML = `
+                <div style="margin-bottom: 5px;">
+                    <span style="color: #94a3b8; font-size: 0.8em;">${inputFormatted} ${from} =</span> 
+                    ${resultFormatted} <small>${to}</small>
+                </div>
+                <div style="font-size: 0.75rem; color: #6366f1; font-weight: 500; opacity: 0.8;">
+                    <i class="fas fa-info-circle"></i> Cotação: 1 ${from} = ${rateFormatted} ${to}
+                </div>
+            `;
+            
             resultDiv.classList.remove('hidden');
 
         } catch (error) {
