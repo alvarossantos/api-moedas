@@ -32,7 +32,7 @@ Este é um projeto de API de conversão de moedas que permite aos usuários conv
 1.  Clone o repositório:
 
     ```bash
-    git clone https://github.com/seu-usuario/api-moedas.git
+    git clone https://github.com/alvarossantos/api-moedas.git
     cd api-moedas
     ```
 
