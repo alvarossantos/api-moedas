@@ -256,6 +256,8 @@ func main() {
 
 	http.HandleFunc("/convert", enableCORS(convertHandler))
 	http.HandleFunc("/rates", enableCORS(ratesHandler))
+	http.HandleFunc("/api/chat", enableCORS(chatHandler))
+	http.HandleFunc("/api/ai/status", enableCORS(aiStatusHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {

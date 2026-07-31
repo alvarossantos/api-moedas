@@ -83,6 +83,137 @@
         </section>
     </div>
 
+    <!-- ═══ Chatbot IA ═══ -->
+    <button class="chat-fab" id="chatFab" onclick="toggleChat()" aria-label="Abrir assistente IA">
+        <i class="fas fa-robot"></i>
+        <span class="chat-fab-dot" id="chatDot"></span>
+    </button>
+
+    <div class="chat-window hidden" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                <div>
+                    <div class="chat-title">CurrencyBot</div>
+                    <small>Assistente IA</small>
+                </div>
+            </div>
+            <button class="chat-close" onclick="toggleChat()" aria-label="Fechar chat">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">
+                Olá! 👋 Sou o <strong>CurrencyBot</strong>.<br><br>
+                Posso te ajudar com:<br>
+                • Cotações de moedas<br>
+                • Converter valores<br>
+                • Dúvidas sobre câmbio<br><br>
+                Como posso te ajudar?
+            </div>
+        </div>
+        <form class="chat-input-area" id="chatForm" onsubmit="sendMessage(event)">
+            <input type="text" id="chatInput" placeholder="Digite sua mensagem..." autocomplete="off" maxlength="500">
+            <button type="submit" id="chatSend" aria-label="Enviar">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+
     <script src="app.js"></script>
+    <script>
+    (function() {
+        let chatOpen = false;
+        let history = [];
+        let typingEl = null;
+
+        window.toggleChat = function() {
+            chatOpen = !chatOpen;
+            const win = document.getElementById('chatWindow');
+            const fab = document.getElementById('chatFab');
+            const dot = document.getElementById('chatDot');
+
+            if (chatOpen) {
+                win.classList.remove('hidden');
+                fab.innerHTML = '<i class="fas fa-times"></i>';
+                dot.style.display = 'none';
+                document.getElementById('chatInput').focus();
+            } else {
+                win.classList.add('hidden');
+                fab.innerHTML = '<i class="fas fa-robot"></i><span class="chat-fab-dot" id="chatDot"></span>';
+            }
+        };
+
+        window.sendMessage = async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const messagesDiv = document.getElementById('chatMessages');
+            const btnSend = document.getElementById('chatSend');
+
+            addMessage(msg, 'user');
+            history.push({ role: 'user', content: msg });
+            input.value = '';
+
+            showTyping();
+            btnSend.disabled = true;
+
+            try {
+                const resp = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: msg,
+                        history: history.slice(-10)
+                    })
+                });
+                const data = await resp.json();
+
+                removeTyping();
+
+                if (resp.ok && data.reply) {
+                    addMessage(data.reply, 'bot');
+                    history.push({ role: 'assistant', content: data.reply });
+                } else {
+                    addMessage(data.error || 'Desculpe, tente novamente.', 'bot');
+                }
+            } catch (err) {
+                removeTyping();
+                addMessage('Erro de conexão. Verifique sua internet.', 'bot');
+            } finally {
+                btnSend.disabled = false;
+                input.focus();
+            }
+        };
+
+        function addMessage(text, type) {
+            const div = document.getElementById('chatMessages');
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg ' + type;
+            msg.textContent = text;
+            div.appendChild(msg);
+            div.scrollTop = div.scrollHeight;
+        }
+
+        function showTyping() {
+            if (typingEl) return;
+            const div = document.getElementById('chatMessages');
+            typingEl = document.createElement('div');
+            typingEl.className = 'chat-msg bot typing';
+            typingEl.id = 'typingIndicator';
+            typingEl.innerHTML = '<span><i></i><i></i><i></i></span>';
+            div.appendChild(typingEl);
+            div.scrollTop = div.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+            typingEl = null;
+        }
+    })();
+    </script>
 </body>
 </html>
