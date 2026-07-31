@@ -8,13 +8,16 @@ Este é um projeto de API de conversão de moedas que permite aos usuários conv
 *   **Conversão de Moedas:** Converta qualquer valor de uma moeda para outra.
 *   **Taxas de Câmbio:** Obtenha as taxas de câmbio mais recentes para uma moeda base.
 *   **Cache:** Armazena em cache os resultados das solicitações para um desempenho mais rápido e para evitar o uso excessivo da API externa.
+*   **🤖 Assistente IA (CurrencyBot):** Chatbot inteligente que responde dúvidas sobre cotações, conversões e moedas usando cotações em tempo real como contexto.
+*   **Multi-Provedor de IA:** Suporte a OpenAI, Google Gemini e OpenRouter (modelos gratuitos) — troque com uma linha no `.env`.
 *   **Frontend Simples:** Uma interface de usuário simples para interagir com a API.
 *   **Deploy Fácil:** O projeto está configurado para ser facilmente implantado usando Docker e Fly.io.
 
 ## 🛠️ Tecnologias Utilizadas
 
-*   **Backend:** Go
+*   **Backend:** Go (padrão `net/http`, zero dependências externas)
 *   **Frontend:** HTML, CSS, JavaScript
+*   **IA:** OpenAI SDK (compatível com OpenAI, Gemini e OpenRouter)
 *   **API Externa:** [ExchangeRate-API](https://www.exchangerate-api.com/)
 *   **Containerização:** Docker
 *   **Hospedagem:** Fly.io
@@ -26,6 +29,7 @@ Este é um projeto de API de conversão de moedas que permite aos usuários conv
 *   Go (versão 1.23 ou superior)
 *   Docker (opcional, para execução em contêiner)
 *   Uma chave de API da [ExchangeRate-API](https://www.exchangerate-api.com/)
+*   Uma chave de API de IA (OpenAI, Gemini ou OpenRouter)
 
 ### Instalação
 
@@ -36,11 +40,17 @@ Este é um projeto de API de conversão de moedas que permite aos usuários conv
     cd api-moedas
     ```
 
-2.  Crie um arquivo `.env` na raiz do projeto e adicione sua chave de API:
+2.  Crie um arquivo `.env` na raiz do projeto com suas chaves de API:
 
+    ```env
+    API_KEY_EXCHANGE=sua-chave-exchange-rate
+
+    # ── IA (configure um provedor) ──
+    AI_PROVIDER=openrouter          # openai | gemini | openrouter
+    OPENROUTER_API_KEY=sua-chave    # https://openrouter.ai/keys
     ```
-    API_KEY_EXCHANGE=sua-chave-de-api
-    ```
+
+    > **Modelos disponíveis:** Veja a tabela completa no `.env.example` do repositório.
 
 ### Executando Localmente
 
@@ -91,6 +101,48 @@ Obtém as taxas de câmbio para uma moeda base.
 
 ```
 GET /rates?base=USD
+```
+
+### `/api/chat`
+
+Chatbot IA que responde dúvidas sobre moedas e cotações. Utiliza cotações em tempo real como contexto.
+
+**Método:** `POST`
+
+**Body (JSON):**
+
+```json
+{
+  "message": "Quanto está o dólar em reais?",
+  "history": []
+}
+```
+
+**Parâmetros:**
+
+*   `message`: A pergunta do usuário (obrigatório).
+*   `history`: Array de mensagens anteriores para manter contexto (opcional, máx. 10).
+
+**Exemplo de resposta:**
+
+```json
+{
+  "reply": "O dólar (USD) está cotado a 5,0938 reais (BRL) neste momento."
+}
+```
+
+### `/api/ai/status`
+
+Retorna o provedor de IA configurado e se está pronto para uso.
+
+**Exemplo de resposta:**
+
+```json
+{
+  "provider": "OpenRouter",
+  "model": "inclusionai/ling-3.0-flash:free",
+  "ready": true
+}
 ```
 
 ## 🤝 Contribuindo
